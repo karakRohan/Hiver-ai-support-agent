@@ -425,9 +425,9 @@ from sklearn.metrics import cohen_kappa_score
 from src.agent import run_agent
 
 
-# ---------------------------------------------------------
+# =========================================================
 # Configuration
-# ---------------------------------------------------------
+# =========================================================
 
 load_dotenv()
 
@@ -442,25 +442,30 @@ except ImportError:
     Groq = None
 
 
-# ---------------------------------------------------------
-# Groq LLM Judge
-# ---------------------------------------------------------
+# =========================================================
+# Groq Client
+# =========================================================
 
 def create_groq_client():
     api_key = os.getenv("GROQ_API_KEY")
 
     if not api_key:
         raise ValueError(
-            "GROQ_API_KEY not found. Please check your .env file."
+            "GROQ_API_KEY not found. Check your .env file."
         )
 
     if Groq is None:
         raise ImportError(
-            "groq package is not installed. Run: pip install groq"
+            "groq package is not installed. "
+            "Run: pip install groq"
         )
 
     return Groq(api_key=api_key)
 
+
+# =========================================================
+# LLM Judge
+# =========================================================
 
 def judge_reply(
     client,
@@ -473,24 +478,26 @@ def judge_reply(
     prompt = f"""
 You are evaluating an AI customer-support reply.
 
-Score the AI reply from 1 to 5 on four dimensions:
+Score the AI reply from 1 to 5 on:
 
 1. helpfulness
 2. groundedness
 3. correctness
 4. overall_quality
 
-Use this scale:
+Rating scale:
 
-1 = very poor
-2 = poor
-3 = acceptable
-4 = good
-5 = excellent
+1 = Very poor
+2 = Poor
+3 = Acceptable
+4 = Good
+5 = Excellent
 
-Important:
-- The reply should directly address the customer's problem.
-- It should be grounded in the supplied historical support evidence.
+Evaluation rules:
+
+- The reply should address the customer's actual problem.
+- The reply should be useful and actionable.
+- The reply should be grounded in the historical support evidence.
 - Do not reward unsupported claims.
 - Do not assume facts that are not present in the evidence.
 - Be strict and consistent.
@@ -504,7 +511,7 @@ HISTORICAL SUPPORT EVIDENCE:
 AI GENERATED REPLY:
 {generated_reply}
 
-Return ONLY valid JSON in exactly this format:
+Return ONLY valid JSON:
 
 {{
   "helpfulness": 1,
@@ -521,8 +528,8 @@ Return ONLY valid JSON in exactly this format:
             {
                 "role": "system",
                 "content": (
-                    "You are a strict but fair evaluator of "
-                    "customer-support AI responses."
+                    "You are a strict and consistent "
+                    "customer-support response evaluator."
                 ),
             },
             {
@@ -535,9 +542,13 @@ Return ONLY valid JSON in exactly this format:
 
     text = response.choices[0].message.content.strip()
 
-    # Remove accidental markdown code fences
+    # Remove markdown code fences if the model adds them.
     if text.startswith("```"):
-        text = text.replace("```json", "").replace("```", "").strip()
+        text = (
+            text.replace("```json", "")
+            .replace("```", "")
+            .strip()
+        )
 
     try:
         result = json.loads(text)
@@ -549,9 +560,9 @@ Return ONLY valid JSON in exactly this format:
     return result
 
 
-# ---------------------------------------------------------
+# =========================================================
 # Helpers
-# ---------------------------------------------------------
+# =========================================================
 
 def safe_int(value):
     try:
@@ -560,16 +571,39 @@ def safe_int(value):
         return None
 
 
-def build_evidence_text(evidence_df: pd.DataFrame) -> str:
-    if evidence_df is None or len(evidence_df) == 0:
+def build_evidence_text(evidence) -> str:
+
+    if evidence is None:
+        return "No historical support evidence was retrieved."
+
+    # Convert list/dict output to DataFrame when necessary.
+    if isinstance(evidence, pd.DataFrame):
+        evidence_df = evidence
+    else:
+        try:
+            evidence_df = pd.DataFrame(evidence)
+        except Exception:
+            return str(evidence)
+
+    if len(evidence_df) == 0:
         return "No historical support evidence was retrieved."
 
     parts = []
 
-    for i, row in evidence_df.head(5).iterrows():
-        customer = str(row.get("customer_text", ""))
-        reply = str(row.get("historical_reply", ""))
-        similarity = row.get("similarity", "")
+    for _, row in evidence_df.head(5).iterrows():
+
+        customer = str(
+            row.get("customer_text", "")
+        )
+
+        reply = str(
+            row.get("historical_reply", "")
+        )
+
+        similarity = row.get(
+            "similarity",
+            ""
+        )
 
         parts.append(
             f"""
@@ -583,9 +617,9 @@ Historical reply: {reply}
     return "\n\n".join(parts)
 
 
-# ---------------------------------------------------------
-# Main Evaluation
-# ---------------------------------------------------------
+# =========================================================
+# Main
+# =========================================================
 
 def main():
 
@@ -621,7 +655,7 @@ def main():
     args = parser.parse_args()
 
     # -----------------------------------------------------
-    # Load data
+    # Check files
     # -----------------------------------------------------
 
     golden_path = Path(args.golden)
@@ -638,10 +672,19 @@ def main():
             f"Historical data not found: {data_path}"
         )
 
-    golden_df = pd.read_csv(golden_path)
-    conversations_df = pd.read_csv(data_path)
+    # -----------------------------------------------------
+    # Load data
+    # -----------------------------------------------------
 
-    # Only evaluate examples with human reply-quality labels
+    golden_df = pd.read_csv(
+        golden_path
+    )
+
+    conversations_df = pd.read_csv(
+        data_path
+    )
+
+    # Only use examples with human reply-quality labels.
     eval_df = golden_df[
         golden_df["gold_reply_quality"].notna()
     ].copy()
@@ -650,11 +693,14 @@ def main():
         eval_df = eval_df.head(args.limit)
 
     if len(eval_df) == 0:
-        print("No human reply-quality labels found.")
+        print(
+            "No human reply-quality labels found."
+        )
         return
 
     print(
-        f"Running LLM judge on {len(eval_df)} examples..."
+        f"Running LLM judge on "
+        f"{len(eval_df)} examples..."
     )
 
     client = create_groq_client()
@@ -662,15 +708,13 @@ def main():
     results = []
 
     # -----------------------------------------------------
-    # Evaluate each example
+    # Evaluate examples
     # -----------------------------------------------------
 
-    for idx, row in enumerate(
+    for idx, (_, item) in enumerate(
         eval_df.iterrows(),
         start=1
     ):
-
-        _, item = row
 
         print(
             f"[{idx}/{len(eval_df)}] Evaluating..."
@@ -686,15 +730,21 @@ def main():
 
         try:
 
-            # Run the actual AI agent
+            # IMPORTANT:
+            # Your actual agent signature is:
+            #
+            # run_agent(message: str, history: pd.DataFrame)
+            #
             agent_result = run_agent(
-                brand="AppleSupport",
                 message=customer_message,
-                conversations=conversations_df,
+                history=conversations_df,
             )
 
             generated_reply = str(
-                agent_result.get("reply", "")
+                agent_result.get(
+                    "reply",
+                    ""
+                )
             )
 
             evidence = agent_result.get(
@@ -702,17 +752,14 @@ def main():
                 []
             )
 
-            # Convert evidence to dataframe if needed
-            if isinstance(evidence, pd.DataFrame):
-                evidence_df = evidence
-            else:
-                evidence_df = pd.DataFrame(evidence)
-
             evidence_text = build_evidence_text(
-                evidence_df
+                evidence
             )
 
-            # LLM Judge
+            # -------------------------------------------------
+            # Ask LLM judge
+            # -------------------------------------------------
+
             judge_result = judge_reply(
                 client=client,
                 model=DEFAULT_MODEL,
@@ -724,36 +771,58 @@ def main():
             results.append(
                 {
                     "conversation_id": item.get(
-                        "conversation_id", ""
+                        "conversation_id",
+                        ""
                     ),
+
                     "customer_text": customer_message,
+
                     "human_quality": human_quality,
+
                     "generated_reply": generated_reply,
+
                     "agent_intent": agent_result.get(
-                        "intent", ""
+                        "intent",
+                        ""
                     ),
+
                     "agent_confidence": agent_result.get(
-                        "confidence", ""
+                        "confidence",
+                        ""
                     ),
+
                     "agent_action": agent_result.get(
-                        "action", ""
+                        "action",
+                        ""
                     ),
+
                     "helpfulness": safe_int(
-                        judge_result.get("helpfulness")
+                        judge_result.get(
+                            "helpfulness"
+                        )
                     ),
+
                     "groundedness": safe_int(
-                        judge_result.get("groundedness")
+                        judge_result.get(
+                            "groundedness"
+                        )
                     ),
+
                     "correctness": safe_int(
-                        judge_result.get("correctness")
+                        judge_result.get(
+                            "correctness"
+                        )
                     ),
+
                     "llm_overall_quality": safe_int(
                         judge_result.get(
                             "overall_quality"
                         )
                     ),
+
                     "judge_reason": judge_result.get(
-                        "reason", ""
+                        "reason",
+                        ""
                     ),
                 }
             )
@@ -767,19 +836,33 @@ def main():
             results.append(
                 {
                     "conversation_id": item.get(
-                        "conversation_id", ""
+                        "conversation_id",
+                        ""
                     ),
+
                     "customer_text": customer_message,
+
                     "human_quality": human_quality,
+
                     "generated_reply": "",
+
                     "agent_intent": "",
+
                     "agent_confidence": "",
+
                     "agent_action": "",
+
                     "helpfulness": None,
+
                     "groundedness": None,
+
                     "correctness": None,
+
                     "llm_overall_quality": None,
-                    "judge_reason": f"ERROR: {e}",
+
+                    "judge_reason": (
+                        f"ERROR: {e}"
+                    ),
                 }
             )
 
@@ -787,7 +870,9 @@ def main():
     # Save results
     # -----------------------------------------------------
 
-    results_df = pd.DataFrame(results)
+    results_df = pd.DataFrame(
+        results
+    )
 
     output_path.parent.mkdir(
         parents=True,
@@ -800,7 +885,7 @@ def main():
     )
 
     # -----------------------------------------------------
-    # Metrics
+    # Calculate metrics
     # -----------------------------------------------------
 
     human_scores = pd.to_numeric(
@@ -818,21 +903,31 @@ def main():
         & llm_scores.notna()
     )
 
-    human_valid = human_scores[valid_mask].astype(int)
-    llm_valid = llm_scores[valid_mask].astype(int)
+    human_valid = human_scores[
+        valid_mask
+    ].astype(int)
+
+    llm_valid = llm_scores[
+        valid_mask
+    ].astype(int)
+
+    # -----------------------------------------------------
+    # Print summary
+    # -----------------------------------------------------
 
     print()
     print("=" * 60)
     print("LLM JUDGE COMPLETE")
     print("=" * 60)
 
-    print()
     print(
-        f"Examples evaluated: {len(results_df)}"
+        f"\nExamples evaluated: "
+        f"{len(results_df)}"
     )
 
     print(
-        f"Valid human/LLM pairs: {len(human_valid)}"
+        f"Valid human/LLM pairs: "
+        f"{len(human_valid)}"
     )
 
     print(
@@ -842,43 +937,61 @@ def main():
     if len(human_valid) > 0:
 
         human_mean = human_valid.mean()
+
         llm_mean = llm_valid.mean()
 
         exact_agreement = (
-            human_valid.values
-            == llm_valid.values
+            human_valid.to_numpy()
+            == llm_valid.to_numpy()
         ).mean()
 
-        # Weighted Cohen's Kappa is appropriate
-        # for ordinal 1-5 ratings.
-        if len(set(human_valid)) > 1 and len(set(llm_valid)) > 1:
-            weighted_kappa = cohen_kappa_score(
-                human_valid,
-                llm_valid,
-                weights="quadratic",
+        # -------------------------------------------------
+        # Weighted Cohen's Kappa
+        #
+        # Appropriate for ordinal 1-5 ratings.
+        # -------------------------------------------------
+
+        if (
+            len(set(human_valid)) > 1
+            and len(set(llm_valid)) > 1
+        ):
+
+            weighted_kappa = (
+                cohen_kappa_score(
+                    human_valid,
+                    llm_valid,
+                    weights="quadratic",
+                )
             )
+
         else:
+
             weighted_kappa = float("nan")
 
-        print()
         print(
-            f"Human quality mean: {human_mean:.3f}"
+            f"\nHuman quality mean: "
+            f"{human_mean:.3f}"
         )
 
         print(
-            f"LLM judge overall mean: {llm_mean:.3f}"
+            f"LLM judge overall mean: "
+            f"{llm_mean:.3f}"
         )
 
         print(
-            f"Exact agreement: {exact_agreement:.3f}"
+            f"Exact agreement: "
+            f"{exact_agreement:.3f}"
         )
 
         if pd.notna(weighted_kappa):
+
             print(
                 f"Weighted Cohen's kappa: "
                 f"{weighted_kappa:.3f}"
             )
+
         else:
+
             print(
                 "Weighted Cohen's kappa: "
                 "not available"
@@ -886,8 +999,9 @@ def main():
 
         print()
         print(
-            "Human vs LLM agreement is based on "
-            "the 1-5 reply-quality ratings."
+            "Agreement compares human "
+            "1-5 reply-quality ratings "
+            "with LLM judge overall ratings."
         )
 
     print()
