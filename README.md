@@ -1,37 +1,96 @@
-# AppleSupport AI Customer Support Agent
+# 🍎 AppleSupport AI Customer Support Agent
 
-An AI-powered customer-support agent built for the Hiver SDE Intern take-home assignment.
+**Made by Rohan Karak**  
+🎯 **Hiver SDE Intern — Take-Home Assignment**
 
-The system uses historical AppleSupport customer-support conversations to:
-
-- classify incoming customer messages into support intents,
-- retrieve relevant historical conversations,
-- draft grounded support replies,
-- and decide whether to auto-handle or escalate a request.
-
-The main focus of this project is not only building the agent, but also evaluating its reliability and understanding where it can fail.
+> An end-to-end AI customer-support agent that combines intent classification, historical-case retrieval, grounded response generation, and conservative human escalation.
 
 ---
 
-# 1. Problem
+## 🌟 Project Overview
 
-Customer-support teams receive a large number of repetitive requests.
+Customer-support systems receive thousands of repetitive requests, but not every request should be handled automatically.
 
-This project builds an AI support agent for `AppleSupport` that can:
+This project builds an **AI support agent for AppleSupport** using historical customer-support conversations from the Twitter Customer Support dataset.
 
-1. Understand the customer's intent.
-2. Find similar historical support interactions.
-3. Draft a useful response using historical evidence.
-4. Decide whether the request is safe to handle automatically.
-5. Escalate uncertain or higher-risk cases.
+The agent can:
+
+- 🧠 Classify the customer's intent
+- 🔎 Retrieve similar historical support conversations
+- ✍️ Draft an evidence-grounded response
+- 🛡️ Decide whether to auto-handle or escalate
+- 📊 Evaluate classification, routing, and response quality
+- 🖥️ Provide an interactive Streamlit demo
+
+The focus is not only on generating a response, but also on showing **what the system understands, what evidence it uses, when it should escalate, and where it can fail**.
 
 ---
 
-# 2. Dataset
+## ✨ Key Features
 
-This project uses the Twitter Customer Support dataset.
+| Feature | Implementation |
+|---|---|
+| 🏷️ Intent Classification | Transparent rule-based classifier |
+| 🔎 Historical Retrieval | TF-IDF similarity |
+| 🤖 Response Generation | Groq + `openai/gpt-oss-20b` |
+| 🛡️ Safety Routing | Auto-handle / Escalate policy |
+| 📚 Evidence | Top historical customer-support cases |
+| 📊 Evaluation | Golden set + automated metrics |
+| ⚖️ Baselines | Majority Class + TF-IDF/Logistic Regression |
+| 🧑‍⚖️ LLM Judge | Helpfulness, groundedness, correctness, quality |
+| 🖥️ Demo UI | Streamlit |
+| 🧪 Tests | Pytest |
 
-Important fields include:
+---
+
+## 🏗️ System Architecture
+
+```text
+                    👤 Customer Message
+                           │
+                           ▼
+                ┌─────────────────────┐
+                │ 🧠 Intent            │
+                │    Classification    │
+                └──────────┬──────────┘
+                           │
+                           ▼
+                ┌─────────────────────┐
+                │ 🔎 Historical        │
+                │    Retrieval (TF-IDF)│
+                └──────────┬──────────┘
+                           │
+                           ▼
+                ┌─────────────────────┐
+                │ 🛡️ Evidence +       │
+                │    Routing Policy    │
+                └──────────┬──────────┘
+                           │
+                    ┌──────┴──────┐
+                    │             │
+                    ▼             ▼
+              ✅ Auto-Handle   👨‍💼 Escalate
+                    │
+                    ▼
+                ┌─────────────────────┐
+                │ 🤖 Groq LLM         │
+                │ Response Generation │
+                └──────────┬──────────┘
+                           │
+                           ▼
+                  💬 Support Reply
+                           │
+                           ▼
+                  📊 Evaluation
+```
+
+---
+
+## 📂 Dataset
+
+This project uses the **Twitter Customer Support (TWCS)** dataset.
+
+Relevant fields include:
 
 - `tweet_id`
 - `author_id`
@@ -41,576 +100,689 @@ Important fields include:
 - `response_tweet_id`
 - `in_response_to_tweet_id`
 
-The dataset contains conversations between customers and brands on Twitter.
+### 🍎 Selected Brand
 
-For this project, only `AppleSupport` conversations are used.
+**AppleSupport**
 
-The pipeline reconstructs customer → AppleSupport response pairs using the tweet relationship fields.
+The pipeline reconstructs **customer → AppleSupport response pairs** using tweet relationship fields.
+
+### 📈 Development Dataset
 
 Current processed development dataset:
 
+**50,000 customer → historical reply pairs**
+
+The raw dataset is intentionally excluded from Git. Place `twcs.csv` inside:
+
 ```text
-50,000 customer → historical reply pairs
-3. System Architecture
-Customer Message
-       |
-       v
-+---------------------+
-| Intent Classification|
-+---------------------+
-       |
-       v
-+---------------------+
-| Historical Retrieval|
-|      TF-IDF         |
-+---------------------+
-       |
-       v
-+---------------------+
-| Evidence + Policy   |
-|       Checks        |
-+---------------------+
-       |
-       +----------------+
-       |                |
-       v                v
- Auto Handle        Escalate
-       |
-       v
-+---------------------+
-|     Groq LLM        |
-| Response Generation |
-+---------------------+
-       |
-       v
- Final Support Reply
-4. Intent Taxonomy
+data/raw/twcs.csv
+```
 
-The system uses 12 AppleSupport-specific intents.
+---
 
-Intent	Description
-ios_update_issue	iOS update and installation problems
-battery_issue	Battery drain, charging and battery-life problems
-device_performance	Slow, freezing or unstable device behavior
-screen_display_issue	Screen, display and visual problems
-app_issue	Problems with applications
-icloud_issue	iCloud synchronization and storage issues
-camera_issue	Camera and photo-related problems
-connectivity_issue	Wi-Fi, Bluetooth, cellular and connectivity issues
-account_security	Account access, phishing and security concerns
-hardware_repair	Physical damage and repair requests
-product_information	Product information and compatibility questions
-general_support	Other AppleSupport requests
+## 🏷️ Intent Taxonomy
 
-The taxonomy was intentionally kept small so that classification remains interpretable and measurable.
+The system uses **12 AppleSupport-specific intents**.
 
-5. Intent Classification
+| # | Intent | Description |
+|---:|---|---|
+| 1 | `ios_update_issue` | iOS update and installation problems |
+| 2 | `battery_issue` | Battery drain, charging and battery-life problems |
+| 3 | `device_performance` | Slow, freezing or unstable device behavior |
+| 4 | `screen_display_issue` | Screen, display and visual problems |
+| 5 | `app_issue` | Problems with applications |
+| 6 | `icloud_issue` | iCloud synchronization and storage issues |
+| 7 | `camera_issue` | Camera and photo-related problems |
+| 8 | `connectivity_issue` | Wi-Fi, Bluetooth, cellular and connectivity issues |
+| 9 | `account_security` | Account access, phishing and security concerns |
+| 10 | `hardware_repair` | Physical damage and repair requests |
+| 11 | `product_information` | Product information and compatibility questions |
+| 12 | `general_support` | Other AppleSupport requests |
 
-The current classifier is a transparent rule-based classifier.
+💡 The taxonomy is intentionally compact and interpretable so that it can be debugged and evaluated reliably.
 
-It uses intent-specific keywords and patterns extracted from recurring support themes.
+---
 
-Example:
+## 🧠 Intent Classification
 
+The current classifier is a **transparent rule-based classifier** using intent-specific keywords and patterns.
+
+### Example
+
+```text
 "My iPhone battery is draining very quickly"
-                |
-                v
-          battery_issue
+                    ↓
+             battery_issue
+```
 
 Another example:
 
+```text
 "My WiFi keeps disconnecting"
-                |
-                v
-       connectivity_issue
-Why a rule-based classifier?
+                    ↓
+           connectivity_issue
+```
 
-The initial classifier was chosen because it is:
+### Why a Rule-Based Classifier?
 
-deterministic,
-fast,
-easy to debug,
-interpretable,
-and simple to reproduce.
+The initial classifier was selected because it is:
 
-A future version can replace it with a supervised classifier or semantic model after collecting more labeled data.
+- ⚡ Fast
+- 🔁 Deterministic
+- 🔍 Interpretable
+- 🐛 Easy to debug
+- ♻️ Easy to reproduce
 
-6. Historical Retrieval
+A supervised classifier is planned as a future improvement after collecting the larger human-labelled evaluation set.
+
+---
+
+## 🔎 Historical Retrieval
 
 After intent classification, the system searches historical AppleSupport conversations for relevant examples.
 
-The current retriever uses TF-IDF similarity.
+### Current Retriever
 
-Each retrieved example contains:
+**TF-IDF similarity**
 
-Customer message
-+
-Historical AppleSupport reply
-+
-Similarity score
+Each retrieved case contains:
 
-The top historical examples are passed to the response-generation stage as evidence.
+- 🆔 Conversation ID
+- 👤 Customer message
+- 💬 Historical AppleSupport reply
+- 📏 Similarity score
 
-Example:
+The top historical cases are passed to the response-generation stage as evidence.
 
-Customer:
-"My iPhone battery is draining very quickly"
+### Why TF-IDF?
 
-Retrieved historical examples:
+TF-IDF was selected as the initial retrieval method because it is:
 
-1. Similarity: 0.82
-   Battery-related customer message
-   Historical AppleSupport reply
+- Lightweight
+- Deterministic
+- Local
+- Reproducible
+- Easy to inspect
+- Does not require a vector database
 
-2. Similarity: 0.81
-   Battery-related customer message
-   Historical AppleSupport reply
+🔮 **Future improvement:** compare TF-IDF with semantic sentence embeddings.
 
-The retrieval threshold is also used by the routing policy.
+---
 
-7. Response Generation
+## 🤖 Response Generation
 
 The response generator uses a Groq-hosted language model.
 
-Current model:
+### Current Model
 
+```text
 openai/gpt-oss-20b
+```
 
-The model receives the customer message and relevant historical support evidence.
+The model receives:
 
-The goal is to produce a response that is:
+- Customer message
+- Predicted intent
+- Relevant historical customer messages
+- Historical AppleSupport replies
+- Similarity scores
 
-relevant,
-helpful,
-concise,
-grounded in available evidence,
-and appropriate for customer support.
+The generation prompt is designed to produce responses that are:
 
-If LLM generation fails because of an API error or rate limit, the system uses a deterministic fallback response.
+- ✅ Relevant
+- ✅ Helpful
+- ✅ Concise
+- ✅ Grounded in retrieved evidence
+- ✅ Appropriate for customer support
 
-8. Auto-Handle vs Escalate
+The prompt also instructs the model to avoid inventing:
 
-The system does not automatically handle every request.
+- ❌ Policies
+- ❌ Prices
+- ❌ Refunds
+- ❌ Timelines
+- ❌ Account information
+- ❌ Unsupported technical claims
+- ❌ Unsupported URLs
+
+If the LLM call fails because of an API error or rate limit, the system uses a **deterministic fallback response**.
+
+---
+
+## 🛡️ Auto-Handle vs Escalate
+
+The system does **not** automatically handle every request.
 
 The routing policy considers:
 
-intent confidence,
-retrieval evidence,
-retrieval similarity,
-and risk-sensitive intent categories.
-Escalation conditions
+- 🎯 Intent confidence
+- 📚 Historical evidence
+- 📏 Retrieval similarity
+- ⚠️ Risk-sensitive intent categories
+
+### 🚨 Escalation Conditions
 
 A request is escalated when:
 
-intent confidence is too low,
-historical evidence is unavailable,
-retrieval similarity is too low,
-intent is account_security,
-or intent is hardware_repair.
-Why?
+- Intent confidence is below the configured threshold
+- Historical evidence is unavailable
+- Best retrieval similarity is too low
+- Intent is `account_security`
+- Intent is `hardware_repair`
 
-Some support requests require human review.
+Otherwise, the request can be auto-handled.
 
-For example:
-
-Account Security
-       |
-       v
-Human Support
-
-and:
-
-Hardware Repair
-       |
-       v
-Human Support
+> 🛡️ **Design principle:** When confidence or evidence is insufficient, prefer human review over a confident unsupported answer.
 
 This conservative strategy prioritizes reliability over maximum automation.
 
-9. Example
-Customer message
-My iPhone battery is draining very quickly.
-Agent output
-Intent: battery_issue
-Confidence: high
-Action: auto_handle
+---
 
-The agent retrieves similar historical battery-support conversations and uses them as evidence for generating the response.
+## 💬 Example
 
-10. Evaluation Strategy
+### Customer Message
 
-The system is evaluated using a manually labeled golden set.
+```text
+My iPhone battery is draining very quickly
+```
 
-Target golden set:
+### Agent Decision
 
-200 examples
+```text
+Intent:      battery_issue
+Confidence:  95%
+Action:      auto_handle
+```
 
-Each example contains:
+The agent retrieves similar historical battery-support conversations and uses those cases as evidence for generating the response.
 
-gold_intent
-gold_action
-gold_reply_quality
-label_notes
+---
 
-The reply-quality label uses a 1–5 scale.
+# 🖥️ Streamlit Demo
 
-Intent evaluation
+The project includes an interactive **Streamlit frontend** in `app.py`.
+
+### The UI provides
+
+- 🍎 AppleSupport branding
+- 📝 Customer message input
+- 🧠 Predicted intent
+- 📊 Confidence score
+- 🛡️ Auto-handle / Escalate decision
+- 💡 Routing reason
+- 💬 Generated support reply
+- 📚 Historical evidence
+- 📏 Similarity scores
+
+### Run the Demo
+
+```powershell
+python -m streamlit run app.py
+```
+
+Then open:
+
+```text
+http://localhost:8501
+```
+
+---
+
+# 📊 Evaluation Strategy
+
+The system is evaluated using a manually labelled **200-example golden set**.
+
+Each labelled example contains:
+
+- `gold_intent`
+- `gold_action`
+- `gold_reply_quality`
+- `label_notes`
+
+### 🎯 Intent Evaluation
 
 Metrics:
 
-Accuracy
-Macro F1
-Per-intent precision, recall and F1
-Routing evaluation
+- Accuracy
+- Macro F1
+- Per-intent Precision
+- Per-intent Recall
+- Per-intent F1
+
+### 🛡️ Routing Evaluation
 
 Metric:
 
-Auto-handle / escalate accuracy
-Response evaluation
+- Auto-handle / Escalate Accuracy
 
-Human:
+### 💬 Response Evaluation
 
-1–5 reply-quality rating
+Human rating:
 
-LLM Judge:
+**1–5 reply-quality score**
 
-Helpfulness
-Groundedness
-Correctness
-Overall quality
-11. Two Baselines
+LLM judge:
 
-Two baselines are implemented.
+- Helpfulness
+- Groundedness
+- Correctness
+- Overall Quality
 
-Baseline 1 — Majority Class
+### 🤝 Human–LLM Agreement
 
-Always predicts the most frequent intent.
+The LLM judge is **not treated as ground truth**.
 
-This provides a simple lower-bound reference.
+Human quality ratings are compared with LLM overall-quality ratings using:
 
-Baseline 2 — TF-IDF + Logistic Regression
+- Exact Agreement
+- Quadratic Weighted Cohen's Kappa
 
-A traditional supervised text-classification baseline:
+---
 
-TF-IDF
-   +
-Logistic Regression
+# 🧪 Development / Smoke-Test Results
 
-This provides a stronger comparison against the rule-based intent classifier.
+⚠️ **Important:** These are **development-only results**, not final benchmark claims.
 
-Final baseline metrics will be regenerated after completing the final golden set.
+The current development evaluation uses only **19 labelled examples**. The final benchmark will be regenerated after the full 200-example golden set is labelled.
 
-12. LLM Judge
+## Baselines
 
-The project includes an LLM-based response evaluator.
+| Model | Accuracy | Macro F1 |
+|---|---:|---:|
+| 🟦 Majority Class | 0.8000 | 0.4444 |
+| 🟩 TF-IDF + Logistic Regression | 0.8000 | **0.7619** |
 
-Each generated response is scored from 1–5 on:
+## Automated Agent Evaluation
 
-Dimension	Scale
-Helpfulness	1–5
-Groundedness	1–5
-Correctness	1–5
-Overall Quality	1–5
+| Metric | Current Result |
+|---|---:|
+| Intent Accuracy | 0.3158 |
+| Intent Macro F1 | 0.2104 |
+| Routing Accuracy | 0.4737 |
 
-The LLM judge also produces a short explanation for its rating.
+## LLM Judge Smoke Test
 
-Results are stored in:
+The latest run evaluated 19 examples. **13 human/LLM pairs were valid**, while some Groq generation calls failed during the run.
 
-data/judge_results.csv
-13. Human–LLM Agreement
+| Metric | Current Result |
+|---|---:|
+| Human Quality Mean | 3.231 |
+| LLM Judge Overall Mean | 3.692 |
+| Exact Agreement | 0.154 |
+| Weighted Cohen's Kappa | 0.039 |
 
-The LLM judge is not treated as ground truth.
+> 📌 These results are included to document development progress only. They should not be presented as the final performance of the system.
 
-Its overall-quality score is compared against human reply-quality labels.
+---
 
-The project calculates:
+# ⚠️ What Is Misleading About My Headline Number?
 
-Exact agreement
-Quadratic weighted Cohen's kappa
+A single headline metric can make an AI system appear stronger than it actually is.
 
-Weighted Cohen's kappa is suitable for ordinal 1–5 ratings because larger disagreements receive more penalty than small disagreements.
+For example:
 
-The current development set contains only 19 human-labeled examples, so the current agreement numbers are considered preliminary.
+- 📈 Accuracy can be inflated by frequent intents.
+- ⚖️ Macro F1 gives a more balanced view across intents.
+- 💬 A high response-quality average does not guarantee safe behavior on ambiguous or high-risk cases.
+- 🔎 Retrieval similarity does not guarantee semantic relevance.
+- 🤖 LLM judge scores are not equivalent to human ground truth.
 
-Final agreement statistics will be generated after completing the larger golden set.
+Therefore, the final evaluation reports multiple dimensions:
 
-14. Current Development Results
+**Accuracy + Macro F1 + Per-intent Metrics + Routing Accuracy + Response Quality + Human–LLM Agreement + Failure Analysis**
 
-Current human-labeled examples:
+The main limitation of a single aggregate number is that it can hide poor performance on rare, ambiguous, or high-risk cases.
 
-19
+---
 
-Preliminary response-quality evaluation:
+# 🔥 Top 5 Failure Modes
 
-Human quality mean:       3.474
-LLM judge overall mean:   3.526
-Exact agreement:          0.211
-Weighted Cohen's kappa:   0.045
+### 1️⃣ Ambiguous Intent
 
-These are development/smoke-test results only.
+Some customer messages do not contain enough information for reliable classification.
 
-They are not presented as the final performance of the system because the required larger human-labeled golden set is still being completed.
+### 2️⃣ Weak Retrieval
 
-15. What Is Misleading About My Headline Number?
+TF-IDF can retrieve textually similar conversations that are not actually relevant.
 
-A single headline metric can make the system appear stronger than it actually is.
+### 3️⃣ Incorrect Routing
 
-For example, overall accuracy can be inflated when some intents are much more frequent than others.
+The system can either:
 
-Similarly, a high average response-quality score does not guarantee that the agent behaves safely on ambiguous or high-risk requests.
+- Escalate a case unnecessarily, or
+- Auto-handle a case that should receive human review.
 
-Therefore the final evaluation will report more than one number:
+### 4️⃣ Unsupported Claims
 
-Accuracy
-Macro F1
-Per-intent performance
-Routing accuracy
-Response quality
-Human–LLM agreement
-Failure analysis
+An LLM may generate technically plausible advice that is not directly supported by retrieved historical evidence.
 
-The main limitation of aggregate metrics is that they can hide poor performance on rare, ambiguous, or high-risk cases.
+### 5️⃣ Generic Responses
 
-16. Top 5 Failure Modes
-
-The main failure modes being tracked are:
-
-1. Ambiguous Intent
-
-Some customer messages do not contain enough information for confident classification.
-
-2. Weak Retrieval
-
-TF-IDF may retrieve textually similar conversations that are not actually relevant to the customer's problem.
-
-3. Incorrect Routing
-
-The system may auto-handle a case that should be escalated, or escalate a case that could safely be handled automatically.
-
-4. Unsupported Claims
-
-The LLM may generate advice that is reasonable but not directly supported by the retrieved historical evidence.
-
-5. Generic Responses
-
-When retrieval evidence is weak, the generated response can become generic and less useful.
+When evidence is weak, the generated response can become safe but less useful.
 
 These failure modes will be quantified using examples from the final golden-set evaluation.
 
-17. Project Structure
+---
+
+# 🧱 Project Structure
+
+```text
 AI/
+│
+├── app.py                         # 🖥️ Streamlit frontend
 │
 ├── configs/
 │
 ├── data/
 │   ├── golden_set/
-│   │   └── golden.csv
+│   │   └── golden.csv            # Human-labelled evaluation set
 │   ├── processed/
-│   │   └── conversations.csv
-│   ├── raw/
-│   │   └── twcs.csv
-│   ├── evaluation_results.json
-│   ├── judge_results.csv
-│   └── judge_test.csv
+│   │   └── conversations.csv     # Processed development data
+│   └── raw/
+│       └── twcs.csv              # Raw dataset (not committed)
 │
 ├── src/
-│   ├── agent.py
-│   ├── baselines.py
-│   ├── data.py
-│   ├── evaluate.py
-│   ├── judge.py
-│   ├── label_golden.py
-│   ├── make_golden.py
-│   ├── pipeline.py
-│   ├── retrieval.py
-│   └── taxonomy.py
+│   ├── agent.py                  # 🤖 Main AI agent
+│   ├── baselines.py              # 📊 Baseline models
+│   ├── data.py                   # Data utilities
+│   ├── evaluate.py               # 📈 Automated evaluation
+│   ├── judge.py                  # ⚖️ LLM judge
+│   ├── label_golden.py           # 🏷️ Manual labelling tool
+│   ├── make_golden.py            # Golden-set creation
+│   ├── pipeline.py               # Dataset reconstruction
+│   ├── retrieval.py              # 🔎 Historical retrieval
+│   └── taxonomy.py               # 🧠 Intent taxonomy/classifier
 │
 ├── tests/
+│   └── test_agent.py             # 🧪 Automated tests
 │
-├── .env
+├── .env.example
 ├── .gitignore
 ├── DECISION_LOG.md
 ├── README.md
 └── requirements.txt
-18. Installation
+```
 
-Python 3.10+ is recommended.
+---
 
-Create a virtual environment:
+# ⚙️ Installation
 
+### 1. Create a virtual environment
+
+```powershell
 python -m venv .venv
+```
 
-Activate it:
+### 2. Activate it
 
+```powershell
 .venv\Scripts\Activate.ps1
+```
 
-Install dependencies:
+### 3. Install dependencies
 
-pip install -r requirements.txt
-19. Environment Variables
+```powershell
+python -m pip install -r requirements.txt
+```
 
-Create a .env file:
+---
 
+# 🔐 Environment Variables
+
+Create a local `.env` file:
+
+```env
 GROQ_API_KEY=your_groq_api_key
 GROQ_MODEL=openai/gpt-oss-20b
+```
 
-Never commit the real API key to GitHub.
+⚠️ **Never commit the real API key to GitHub.**
 
-Use .env.example for sharing the required environment-variable names.
+Use `.env.example` for sharing the required variable names without exposing secrets.
 
-20. Reconstruct Conversations
+---
+
+# 🔄 Reconstruct Conversations
+
+Place the TWCS dataset at:
+
+```text
+data/raw/twcs.csv
+```
 
 Run:
 
+```powershell
 python -m src.pipeline --input data/raw/twcs.csv --brand AppleSupport --sample 50000
+```
 
-Expected output:
+Expected development output:
 
+```text
 Found 106860 tweets from AppleSupport
 Customer/reply pairs: 50000
 Output: data\processed\conversations.csv
-21. Run the AI Agent
+```
+
+---
+
+# ▶️ Run the AI Agent
 
 Example:
 
+```powershell
 python -m src.agent --brand AppleSupport --message "My iPhone battery is draining very quickly"
+```
 
 The agent returns:
 
-intent,
-confidence,
-action,
-reason,
-generated reply,
-retrieved evidence.
-22. Create the Golden Set
+- Intent
+- Confidence
+- Action
+- Reason
+- Generated reply
+- Retrieved evidence
 
-Generate the evaluation sample:
+---
 
+# 🏷️ Create the Golden Set
+
+Generate the 200-example sample:
+
+```powershell
 python -m src.make_golden --input data/processed/conversations.csv --output data/golden_set/golden.csv --n 200
+```
 
-Start manual labeling:
+Start manual labelling:
 
+```powershell
 python -m src.label_golden --input data/golden_set/golden.csv
+```
 
-The labeling script saves progress so labeling can be continued later.
+💾 The labelling script saves progress, so labelling can be continued later.
 
-23. Run Baselines
+---
+
+# 📈 Run Baselines
+
+```powershell
 python -m src.baselines --golden data/golden_set/golden.csv
+```
 
-Run this after completing the final human-labeled golden set to obtain final baseline metrics.
+Run this after completing the final golden set to obtain final baseline metrics.
 
-24. Run Automated Evaluation
+---
+
+# 📊 Run Automated Evaluation
+
+```powershell
 python -m src.evaluate --golden data/golden_set/golden.csv --data data/processed/conversations.csv
+```
 
 Output:
 
+```text
 data/evaluation_results.json
-25. Run LLM Judge
+```
+
+---
+
+# ⚖️ Run the LLM Judge
+
+```powershell
 python -m src.judge --golden data/golden_set/golden.csv --data data/processed/conversations.csv --output data/judge_results.csv
+```
 
 Output:
 
+```text
 data/judge_results.csv
-26. Engineering Decisions
+```
+
+---
+
+# 🧪 Testing
+
+Run the automated test suite:
+
+```powershell
+python -m pytest tests/test_agent.py -v
+```
+
+### Current Development Test Status
+
+```text
+5 passed
+```
+
+The current tests cover:
+
+- 🔋 Battery intent classification
+- 📷 Camera intent classification
+- 📶 Connectivity intent classification
+- 🔐 Account-security intent classification
+- 🔎 Retrieval result structure
+
+---
+
+# 📝 Engineering Decision Log
 
 Major engineering decisions are documented in:
 
+```text
 DECISION_LOG.md
+```
 
-The decision log covers:
+The log covers:
 
-brand selection,
-conversation reconstruction,
-intent taxonomy,
-retrieval approach,
-classifier design,
-LLM selection,
-escalation policy,
-golden-set design,
-baselines,
-LLM judging,
-and failure analysis.
-27. Limitations
+- 🍎 Brand selection
+- 🔄 Conversation reconstruction
+- 🏷️ Intent taxonomy
+- 🔎 Retrieval strategy
+- 🧠 Classifier design
+- 🤖 LLM selection
+- 🛡️ Escalation policy
+- 🧪 Golden-set design
+- 📊 Baselines
+- ⚖️ LLM judging
+- 🔥 Failure analysis
+
+---
+
+# ⚠️ Limitations
 
 Current limitations include:
 
-The intent classifier is rule-based.
-TF-IDF retrieval has limited semantic understanding.
-Response generation depends on an external LLM API.
-API rate limits can affect large evaluation runs.
-Historical support replies may contain outdated information.
-Historical examples are not guaranteed to represent the ideal modern support response.
-Aggregate metrics can hide failures on difficult or rare cases.
-The current development evaluation is small.
+- The intent classifier is rule-based.
+- TF-IDF has limited semantic understanding.
+- Response generation depends on an external LLM API.
+- API rate limits can affect large evaluation runs.
+- Historical support replies may contain outdated information.
+- Historical examples are not guaranteed to represent ideal modern support behavior.
+- Lexical retrieval can return superficially similar cases.
+- Aggregate metrics can hide failures on difficult or rare cases.
+- The current development evaluation is small.
 
 These limitations are considered when interpreting the final results.
 
-28. Next-Week Improvement Plan
+---
 
-If development continued for another week:
+# 🚀 Next-Week Improvement Plan
 
-Day 1–2 — Improve Intent Classification
+### 📅 Day 1–2 — Improve Intent Classification
 
 Train and evaluate a supervised classifier using the completed golden set.
 
-Day 3 — Improve Retrieval
+### 📅 Day 3 — Improve Retrieval
 
 Compare TF-IDF with sentence embeddings and evaluate retrieval quality.
 
-Day 4 — Grounding Evaluation
+### 📅 Day 4 — Grounding Evaluation
 
 Measure whether generated claims are actually supported by retrieved historical evidence.
 
-Day 5 — Safer Response Generation
+### 📅 Day 5 — Safer Response Generation
 
 Add stronger grounding constraints and structured response validation.
 
-Day 6 — Routing Optimization
+### 📅 Day 6 — Routing Optimization
 
 Tune escalation thresholds using the golden set and analyze false auto-handles.
 
-Day 7 — Error Analysis
+### 📅 Day 7 — Error Analysis
 
-Review difficult examples and update the taxonomy, retrieval strategy and escalation policy.
+Review difficult examples and update the taxonomy, retrieval strategy, and escalation policy.
 
-29. Reproducibility Checklist
+---
+
+# 🔁 Reproducibility Checklist
 
 A fresh setup should follow:
 
-1. Create virtual environment
-2. Install requirements
-3. Configure GROQ_API_KEY
-4. Place twcs.csv in data/raw/
-5. Run conversation reconstruction
-6. Run the agent
-7. Create the golden set
-8. Label the golden set
-9. Run baselines
-10. Run automated evaluation
-11. Run LLM judge
+1. 🐍 Create virtual environment
+2. 📦 Install dependencies
+3. 🔐 Configure `GROQ_API_KEY`
+4. 📁 Place `twcs.csv` in `data/raw/`
+5. 🔄 Run conversation reconstruction
+6. 🤖 Run the agent or Streamlit demo
+7. 🧪 Create the golden set
+8. 🏷️ Complete human labelling
+9. 📊 Run baselines
+10. 📈 Run automated evaluation
+11. ⚖️ Run the LLM judge
+12. 🧪 Run the test suite
 
-The project is designed so that the core pipeline can be reproduced without a vector database.
+The core retrieval pipeline does **not require a vector database**.
 
-30. Final Status
-Dataset reconstruction       DONE
-AppleSupport selection       DONE
-Intent taxonomy              DONE
-Intent classifier            DONE
-Historical retrieval         DONE
-Response generation          DONE
-Escalation policy            DONE
-Two baselines                DONE
-LLM Judge                    DONE
-Human–LLM agreement          DONE
-Golden-set labeling          IN PROGRESS
-Final evaluation             PENDING
-Final failure analysis       PENDING
-Final report                 PENDING
-31. Summary
+---
 
-The project implements an end-to-end AI customer-support pipeline:
+# ✅ Final Status
 
+| Component | Status |
+|---|---|
+| 🍎 AppleSupport selection | ✅ Done |
+| 🔄 Dataset reconstruction | ✅ Done |
+| 🏷️ Intent taxonomy | ✅ Done |
+| 🧠 Intent classifier | ✅ Done |
+| 🔎 Historical retrieval | ✅ Done |
+| 🤖 Response generation | ✅ Done |
+| 🛡️ Escalation policy | ✅ Done |
+| 🖥️ Streamlit frontend | ✅ Done |
+| 📊 Two baselines | ✅ Done |
+| ⚖️ LLM judge pipeline | ✅ Implemented |
+| 🧪 Automated tests | ✅ 5/5 passed |
+| 🏷️ Golden-set labelling | ⏳ In progress |
+| 📈 Final evaluation | ⏳ Pending |
+| 🔥 Final failure analysis | ⏳ Pending |
+| 📝 Final report metrics | ⏳ Pending |
+
+---
+
+# 🎯 Summary
+
+This project implements an end-to-end AppleSupport customer-support workflow:
+
+```text
 Raw Twitter Support Data
           ↓
 Conversation Reconstruction
@@ -626,23 +798,23 @@ Routing / Safety Policy
 Auto-Handle or Escalate
           ↓
 Human + LLM Evaluation
+          ↓
+Streamlit Demonstration
+```
 
-The goal is not simply to produce an AI-generated answer.
+The objective is not merely to generate an AI answer.
 
-The goal is to build a support system that can also demonstrate:
+The objective is to demonstrate:
 
-what it understands,
-what evidence it uses,
-when it should answer,
-when it should escalate,
-how well it performs,
-and where it fails.
+- 🧠 **What the system understands**
+- 📚 **What evidence it uses**
+- 🛡️ **When it should answer**
+- 👨‍💼 **When it should escalate**
+- 📊 **How well it performs**
+- 🔥 **Where it fails**
+- 🚀 **How it can be improved**
 
+---
 
-# AppleSupport AI Customer Support Agent
-
-**Made by Rohan Karak**
-
-> Hiver SDE Intern — Take-Home Assignment
-
-An AI-powered customer-support agent built for the Hiver SDE Intern take-home assignment.
+**Made by Rohan Karak**  
+🎯 *Hiver SDE Intern — Take-Home Assignment*
