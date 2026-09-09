@@ -1,4 +1,4 @@
-# 🍎 AppleSupport AI Customer Support Agent
+# 💻 AppleSupport AI Customer Support Agent
 
 **Made by Rohan Karak**  
 🎯 **Hiver SDE Intern — Take-Home Assignment**
