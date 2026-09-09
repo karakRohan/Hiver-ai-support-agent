@@ -101,8 +101,6 @@ INTENTS = {
         "app store",
         "not opening",
         "won't open",
-        # "not working",
-        # "keeps crashing",
     ],
 
     "icloud_issue": [
@@ -190,6 +188,23 @@ INTENTS = {
 }
 
 
+def keyword_matches(text: str, keyword: str) -> bool:
+    """
+    Match a keyword as a complete word/phrase.
+
+    This prevents substring mistakes such as:
+        'app' matching inside 'Apple'
+    """
+
+    pattern = r"(?<!\w)" + re.escape(keyword) + r"(?!\w)"
+
+    return re.search(
+        pattern,
+        text,
+        flags=re.IGNORECASE
+    ) is not None
+
+
 def classify_rules(text: str):
 
     text = str(text).lower()
@@ -202,7 +217,7 @@ def classify_rules(text: str):
 
         for keyword in keywords:
 
-            if keyword in text:
+            if keyword_matches(text, keyword):
                 score += 1
 
         scores[intent] = score
@@ -215,7 +230,6 @@ def classify_rules(text: str):
     best_score = scores[best_intent]
 
     if best_score == 0:
-
         return "general_support", 0.35
 
     total_score = sum(
@@ -259,6 +273,8 @@ if __name__ == "__main__":
         "WiFi is not working",
         "Someone sent me a phishing message",
         "My phone keeps freezing",
+        "Someone is trying to access my Apple account",
+        "My app is not opening",
     ]
 
     for example in examples:

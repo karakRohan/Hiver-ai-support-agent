@@ -1,13 +1,13 @@
 {
   "intent": {
-    "accuracy": 0.9474,
-    "macro_f1": 0.6364,
+    "accuracy": 0.3158,
+    "macro_f1": 0.2104,
     "n_labelled": 19,
     "classification_report": {
       "app_issue": {
         "precision": 1.0,
-        "recall": 1.0,
-        "f1-score": 1.0,
+        "recall": 0.07692307692307693,
+        "f1-score": 0.14285714285714285,
         "support": 13.0
       },
       "connectivity_issue": {
@@ -16,29 +16,41 @@
         "f1-score": 0.0,
         "support": 1.0
       },
+      "general_support": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1-score": 0.0,
+        "support": 0.0
+      },
       "ios_update_issue": {
         "precision": 0.8333333333333334,
         "recall": 1.0,
         "f1-score": 0.9090909090909091,
         "support": 5.0
       },
-      "accuracy": 0.9473684210526315,
+      "product_information": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1-score": 0.0,
+        "support": 0.0
+      },
+      "accuracy": 0.3157894736842105,
       "macro avg": {
-        "precision": 0.6111111111111112,
-        "recall": 0.6666666666666666,
-        "f1-score": 0.6363636363636364,
+        "precision": 0.3666666666666667,
+        "recall": 0.21538461538461537,
+        "f1-score": 0.2103896103896104,
         "support": 19.0
       },
       "weighted avg": {
         "precision": 0.9035087719298246,
-        "recall": 0.9473684210526315,
-        "f1-score": 0.9234449760765551,
+        "recall": 0.3157894736842105,
+        "f1-score": 0.33697881066302116,
         "support": 19.0
       }
     }
   },
   "routing": {
-    "accuracy": 0.6842,
+    "accuracy": 0.4737,
     "n_labelled": 19
   }
 }
