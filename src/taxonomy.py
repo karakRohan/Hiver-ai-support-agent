@@ -101,8 +101,8 @@ INTENTS = {
         "app store",
         "not opening",
         "won't open",
-        "not working",
-        "keeps crashing",
+        # "not working",
+        # "keeps crashing",
     ],
 
     "icloud_issue": [
