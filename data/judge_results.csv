@@ -1,0 +1,94 @@
+conversation_id,customer_text,historical_reply,generated_reply,human_quality,judge_helpfulness,judge_groundedness,judge_correctness,judge_overall,judge_reason,intent,confidence,action
+894895_894897,@AppleSupport Music isn’t as loud as it used to be and sky go (that’s probably a Sky go app issue..... on full volume and can hardly hear any talking).,@332480 Are you using the native Music app or another app to play that music? Have you tried other apps as well?,"Hi there!  
+To help get your audio back to normal, could you let me know:
+
+- Are you listening to music with the native Music app or a third‑party app?  
+- Do you notice the same lower volume in other apps (e.g., Podcasts, YouTube)?  
+- Is the device’s volume limit enabled? (Settings → Accessibility → Audio/Visual → Volume Limit)  
+- Are any audio enhancements (EQ, “Sound Check,” etc.) turned on?
+
+Once I have that info, I can walk you through the next steps. Thanks!",3.0,4,5,5,4,"The reply asks relevant, actionable questions and references correct Apple settings, making it helpful and accurate.",app_issue,0.95,auto_handle
+1599046_1599045,@AppleSupport can we get an update for iOS to stop this bug? <URL>,@491082 We'd like to help. Could we please have you send us a DM so we can get started on this? <URL>,"Thanks for reaching out. To help determine if an update is available for the bug you’re seeing, could you let us know which iOS version you’re currently running and any details about the issue? You can also DM us for further assistance.",3.0,4,5,5,4,"The reply appropriately requests needed information and offers further assistance, with no unsupported claims.",ios_update_issue,0.817,auto_handle
+610247_610246,Can someone explain to me why the WiFi setting keeps turning on by itself with the new iPhone update?!?!? 😭 @115858,@265083 Check out the following article for information on this: <URL> <URL>,"Hi @115858 – the new iOS update can sometimes re‑enable Wi‑Fi Assist or auto‑join settings.  
+1. **Turn off Wi‑Fi Assist**: Settings → Cellular → Wi‑Fi Assist.  
+2. **Disable Auto‑Join** for your network: Settings → Wi‑Fi → tap the “i” next to your network → Auto‑Join off.  
+
+If the Wi‑Fi still turns on automatically, let us know your iOS version and we’ll dig deeper. For more details, see Apple Support: https://support.apple.com/en-us/HT204023.",4.0,4,5,5,4,"Provides clear, accurate steps to resolve the issue, referencing official Apple support.",ios_update_issue,0.75,auto_handle
+240544_240543,@173136 @AppleSupport Ah oui effectivement déjà moi mon 6S est un peu ralenti j’imagine pas l’tien,@173135 We offer support via Twitter in English. Contact us for help in your preferred language here: <URL>,"Bonjour !  
+Pour vous aider à retrouver la fluidité de votre iPhone 6 S, pourriez‑vous nous préciser :
+
+1. La version d’iOS installée ?  
+2. Si vous avez remarqué une baisse de la santé de la batterie (via Réglages > Batterie > État de la batterie).  
+3. Si vous avez récemment installé de nouvelles applications ou mis à jour le système.
+
+En attendant votre retour, vous pouvez essayer :  
+- Fermer les applications en arrière‑plan.  
+- Redémarrer l’appareil.  
+- Vérifier les mises à jour disponibles dans Réglages > Général > Mise à jour logicielle.
+
+Nous restons à votre disposition pour approfondir le diagnostic.",5.0,4,5,5,4,"The reply offers practical, standard troubleshooting steps for a slow iPhone 6S, is fully grounded in common support practices, and contains no incorrect or unsafe information.",app_issue,0.95,auto_handle
+1533028_1533027,Hey @AppleSupport can you explain this problem I’m having every time I️ try to type “I️” 😑,@475479 We can definitely look into this with you. Which device are you using? DM us and we'll go from there. <URL>,"Hi! I’m sorry you’re having trouble typing “I.” Could you let me know which device you’re using and the iOS version? Once I have that info, I can help you troubleshoot the issue.",4.0,4,5,5,4,"The reply is polite, asks relevant details, and aligns with the historical response, but it lacks any additional troubleshooting steps or empathy beyond the initial apology.",app_issue,0.95,auto_handle
+873895_873896,@AppleSupport @200998 are perfectly working fine with my phone it’s @115858 maps not working,@327468 Let's continue this conversation in DM. <URL>,"Hi! Sorry you’re having trouble with Maps.  
+Could you let us know:
+
+1. Does the Maps app open at all, or do you see an error message?  
+2. What iOS version are you running?  
+3. Are Location Services enabled for Maps (Settings → Privacy → Location Services)?
+
+With that info we can guide you through a quick fix.",5.0,4,5,5,4,"The reply asks relevant clarifying questions, is fully grounded and correct, but does not provide a direct solution.",app_issue,0.95,auto_handle
+2966663_2966662,"LOL, the update button’s body keeps spinning. Target the wrong layer, @115858? <URL>",@652687 We appreciate you contacting us. Not being able to update would concern us too. Let's partner together in resolving this matter. DM us to get started. <URL>,"Hi @115858, sorry you’re seeing the update button spin.  
+Does this happen on both Wi‑Fi and cellular?  
+Have you tried restarting your device or signing out of the App Store and back in?  
+Let me know what you try, and we’ll dig deeper.",1.0,3,4,4,3,"The reply acknowledges the issue and offers standard troubleshooting steps, which are generally helpful and correct, but it does not address the specific problem of the wrong layer or provide a targeted solution.",ios_update_issue,0.95,auto_handle
+1748014_1748012,"10) hola @AppleSupport @115858, recordáis que tenéis un caso abierto conmigo desde hace ya 3 meses verdad?? Solución cuando???",@526937 We offer support via Twitter in English. Get help in Spanish here: <URL> or join <URL>,"Hola, sentimos mucho la demora. Por favor, indícanos el número de caso o envíanos un mensaje privado con los detalles para que podamos revisar el estado y acelerar la resolución. También puedes consultar el progreso directamente en la app Apple Support o en el sitio web de Apple. ¡Gracias por tu paciencia!",5.0,3,4,5,4,"The reply acknowledges the delay and offers next steps, but does not provide a concrete solution or timeline.",app_issue,0.95,auto_handle
+146597_146596,"@AppleSupport you restored my phone without my permission and deleted everything on my phone, thanks for nothing.",@149275 We'd like to look into this with you. Can you tell us when you noticed the missing content and restored device?,"I’m sorry you’re experiencing this.  
+Could you let us know:
+
+1. When you first noticed the missing content?  
+2. Whether you performed a restore recently (e.g., from iCloud or iTunes)?  
+3. If you have a recent backup you can restore from?  
+
+With that information we can help you recover your data.",5.0,3,5,5,3,"The reply is polite and asks for relevant details, but it fails to acknowledge the customer’s claim of unauthorized restoration and does not offer a solution or apology, making it only acceptable.",app_issue,0.95,auto_handle
+2210633_2210635,@AppleSupport Thank you. Can you recommend a website to purchase at good value #airpods #apple #iphone8,"@646131 Of course, you can purchase AirPods from <URL> Let us know if you need help and we'll get you in contact with our Sales Advisors.","Sure! The safest places to buy AirPods at good value are:
+
+- **Apple.com** or the **Apple Store app** – you’ll get the latest models and any available refurbished options.
+- **Authorized resellers** such as **Best Buy**, **Amazon**, or **B&H Photo** – they often run sales and offer Apple‑certified products.
+
+If you’re looking for a refurbished unit, check the Apple Refurbished Store for a warranty and a lower price. Let us know if you need help locating a specific retailer or setting up a purchase.",3.0,5,5,5,5,"The reply gives accurate, relevant website suggestions for purchasing AirPods at good value, fully grounded in known retailers.",app_issue,0.75,auto_handle
+982069_982067,Since upgrading to 11.0.3 I’ve noticed that bluetooth has come on randomly. @AppleSupport,@352848 We're here to help! Check out info on Bluetooth in iOS 11.0.3. This link has more info: <URL>,"Hi @AppleSupport, thanks for reaching out.  
+The random activation of Bluetooth after updating to iOS 11.0.3 has been reported by other users. A quick fix is to reset your network settings: **Settings > General > Reset > Reset Network Settings**.  
+If the problem continues, try disabling Bluetooth in Settings, then re‑enabling it. For more detailed steps, you can view Apple’s support article on Bluetooth in iOS 11.0.3.  
+
+Let us know if you need further help.",2.0,4,3,4,4,"The reply gives practical steps that are likely to help, but it includes an unsupported claim about other users reporting the issue.",app_issue,0.75,auto_handle
+1714773_1714771,@AppleSupport safari is literally bricked on my phone now wtf i was just on amazon :(,@519334 We want to help. Are you able to Force Quit Safari or restart your iPhone? <URL>,"Hi there! Let’s try a quick fix first: force‑quit Safari (double‑tap the Home button or swipe up from the bottom and swipe Safari off the screen) and then restart your iPhone. If Safari still won’t open, could you let us know which iOS version you’re running? That’ll help us troubleshoot further.",4.0,4,5,5,4,"The reply offers a standard, correct troubleshooting step and asks for useful info, but it could include more detailed guidance or alternative solutions.",app_issue,0.95,auto_handle
+700016_700018,@AppleSupport i am using 11.1.2 it restarts on its own 20+ times a day,@287020 Alright. Let's move over to DM to troubleshoot further. <URL>,"I’m sorry you’re experiencing frequent restarts on iOS 11.1.2.  
+Could you let me know if you’ve already tried:
+
+1. Updating to the latest iOS 11.1.2 build (if not, please install it).  
+2. Resetting all settings (Settings → General → Reset → Reset All Settings).  
+3. Checking for any recently installed apps that might be causing the issue.
+
+If you’re comfortable, we can move this conversation to a private chat so we can dig deeper and get you back to a stable system.",3.0,4,4,4,4,"The reply offers standard, safe troubleshooting steps that are relevant to the issue, though the phrasing about the ""latest iOS 11.1.2 build"" is slightly imprecise.",app_issue,0.95,auto_handle
+657201_657200,My ios 11.0.2 loses the wi fi Connection every 3 minutes And i must reconnection ! @AppleSupport,@276437 We're here to help. Which device are you experiencing the Wi-Fi issues on?,"Hi! I’m sorry you’re having trouble staying connected.  
+Could you let me know which iPhone or iPad you’re using?  
+In the meantime, try updating to the latest iOS version (if you haven’t already) and, if the issue persists, reset your network settings: Settings → General → Transfer or Reset iPhone → Reset → Reset Network Settings. Let me know how it goes!",2.0,4,5,5,5,"The reply provides relevant, accurate troubleshooting steps and is fully grounded in standard support practices.",ios_update_issue,0.71,auto_handle
+200497_200495,@AppleSupport what have you done w ios 11? It has crippled my phone. Each new update seems to do more harm than good. Msg app useless,@163308 We want to help. Being able to use your Message app is certainly important. What happens when you try to use the message app?,"Hi there! I’m sorry to hear that iOS 11 is causing trouble with your Messages app. Could you let me know:
+
+1. Which iPhone model you’re using  
+2. The exact iOS version (e.g., 11.0.3)  
+3. What happens when you try to open or send a message (error message, app crashes, etc.)  
+4. Any troubleshooting steps you’ve already tried (restart, reset network settings, etc.)
+
+With that information we can pinpoint the issue and find a solution. Thanks!",5.0,4,5,5,4,"The reply is helpful, grounded, correct, and safe.",ios_update_issue,0.85,auto_handle
+2522533_2522532,"@AppleSupport wondering if you heard the news that 11.1.1 sucks, most things no longer work on my phone.... thanks again for the hardship! Can I go back to 10.3 please",@718411 We'd like to help with this. Could you please send us a DM with what issues you're having so we can take a look? <URL>,"Hi there,
+
+Unfortunately, Apple no longer signs iOS 10.3, so a downgrade isn’t possible unless Apple is still signing that version (which it isn’t). If you have a backup from before the update, you could restore that backup, but it would still require the firmware to be signed.
+
+Could you let us know which specific apps or functions aren’t working after the 11.1.1 update? That will help us troubleshoot the issue. You can reply here or DM us with more details.
+
+For general troubleshooting steps, you can visit https://support.apple.com.",1.0,5,5,5,5,"The reply accurately explains that iOS 10.3 is no longer signed, offers a realistic workaround, and asks for specific issues, making it helpful, fully grounded, and correct.",app_issue,0.95,auto_handle
+2009140_2009139,@115858 stop making me update my phone if this is what’s gonna happen,"@594105 If you're running into any issue, we certainly want to help to get this resolved. Go ahead and DM us so we can help. <URL>","I’m sorry you’re having trouble after the update.  
+Could you let me know which iPhone model you have and the iOS version you’re running? Also, please describe what’s happening (e.g., freezes, crashes, battery drain). Once I have that info, I can help you find a solution.",1.0,3,5,5,3,"The reply is polite and requests useful diagnostic details, but it does not directly address the customer's frustration about updates or offer a solution. It is fully grounded and correct.",ios_update_issue,0.75,auto_handle
+2431326_2431325,@AppleSupport Fix this man <URL>,"@697900 We've released a fix for this issue in the latest iOS version which is iOS 11.1.1. To install this version, make sure to create a backup and update using the steps here: <URL>","Hi, we’ve fixed this issue in the latest iOS update. Please back up your device and install the newest iOS version. You can follow the steps here: https://support.apple.com/en-us/HTxxxx. Let us know if you need any further help.",5.0,3,3,4,3,"The reply gives general, correct advice but lacks the specific version detail from the historical reply, making it only partially grounded and moderately helpful.",app_issue,0.95,auto_handle
+1938100_1938098,Hey @AppleSupport I seem to be missing something. 11.0.3 isn’t being my friend. <URL>,"@160279 Let's work on this together. Have you restarted since noticing the status bar missing? If so, please DM us to proceed. <URL>","Hi! Thanks for reaching out.  
+Could you let us know if you’ve restarted your device since the 11.0.3 update? If the problem still appears, please share your iPhone model and any recent changes you’ve made. We’ll walk you through the next steps.",5.0,4,4,5,4,"The reply asks the right troubleshooting step (restart) and requests relevant details, matching the historical context. It is safe, correct, and helpful.",app_issue,0.95,auto_handle

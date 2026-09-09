@@ -1,0 +1,27 @@
+conversation_id,customer_text,historical_reply,generated_reply,human_quality,judge_helpfulness,judge_groundedness,judge_correctness,judge_overall,judge_reason,intent,confidence,action
+894895_894897,@AppleSupport Music isn’t as loud as it used to be and sky go (that’s probably a Sky go app issue..... on full volume and can hardly hear any talking).,@332480 Are you using the native Music app or another app to play that music? Have you tried other apps as well?,"Hi there,
+
+It sounds like the volume on your device has dropped, especially when using the Music app and Sky Go. Let’s try a few quick checks:
+
+1. **Volume & Audio Settings**  
+   - Make sure the device’s main volume is at maximum.  
+   - Go to Settings → Accessibility → Audio/Visual and confirm that “Reduce Loud Sounds” is turned off.  
+   - If you’re using a headphone or Bluetooth device, check its volume level and any built‑in equalizer settings.
+
+2. **App‑Specific Issues**  
+   - Are you hearing the same low volume in other apps (e.g., YouTube, Podcasts)?  
+   - If the problem is only with Sky Go, try deleting and reinstalling the app, or check for an update.
+
+3. **Reset Settings (if needed)**  
+   - If the volume remains low across all apps, you can reset all settings: Settings → General → Transfer or Reset iPhone → Reset → Reset All Settings. (This won’t delete your data, just restores system defaults.)
+
+Let me know how it goes or if you need further help.",3.0,4,4,5,4,"The reply offers practical, standard troubleshooting steps that are relevant to the issue and are supported by common iOS settings. It is helpful and correct, though it could be slightly more concise.",app_issue,0.95,auto_handle
+1599046_1599045,@AppleSupport can we get an update for iOS to stop this bug? <URL>,@491082 We'd like to help. Could we please have you send us a DM so we can get started on this? <URL>,"Thanks for reaching out. Could you let us know which iOS version you’re currently running? If you’d like to discuss this further, please send us a direct message so we can investigate the bug.",3.0,3,5,5,3,"The reply is grounded and correct, but only partially helpful as it merely requests more info rather than providing an update or solution.",ios_update_issue,0.817,auto_handle
+610247_610246,Can someone explain to me why the WiFi setting keeps turning on by itself with the new iPhone update?!?!? 😭 @115858,@265083 Check out the following article for information on this: <URL> <URL>,"Hi @115858,  
+It sounds like Wi‑Fi is being re‑enabled automatically.  
+1. Open **Settings → Wi‑Fi** and toggle it off.  
+2. If it turns back on, try resetting network settings: **Settings → General → Transfer or Reset iPhone → Reset → Reset Network Settings**.  
+
+For step‑by‑step instructions, see Apple Support: https://support.apple.com/en-us/HT204023.  
+
+Let me know if that resolves the issue.",4.0,4,5,5,4,"Provides clear steps and a reference, but does not explain the underlying cause.",ios_update_issue,0.75,auto_handle
