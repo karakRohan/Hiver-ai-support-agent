@@ -135,37 +135,9 @@ from .retrieval import Retriever
 load_dotenv()
 
 
-# ---------------------------------------------------------
-# Embedding model
-# ---------------------------------------------------------
-
-def get_embedder():
-    """
-    Optional SentenceTransformer loader.
-
-    Currently the main agent uses TF-IDF retrieval for
-    reliable local execution. This function is kept so
-    semantic embeddings can be enabled later.
-    """
-    try:
-        from sentence_transformers import SentenceTransformer
-
-        model_name = os.getenv(
-            "EMBEDDING_MODEL",
-            "sentence-transformers/all-MiniLM-L6-v2",
-        )
-
-        return SentenceTransformer(model_name)
-
-    except Exception as exc:
-        print(f"Embedding model unavailable: {exc}")
-        print("Falling back to TF-IDF retrieval.")
-        return None
-
-
-# ---------------------------------------------------------
-# Escalation policy
-# ---------------------------------------------------------
+# =========================================================
+# Escalation Policy
+# =========================================================
 
 def should_escalate(intent: str, confidence: float, evidence: list):
     """
@@ -173,57 +145,60 @@ def should_escalate(intent: str, confidence: float, evidence: list):
     or escalated to a human.
     """
 
-    # Low confidence
+    # Low-confidence predictions should not be automated.
     if confidence < 0.70:
         return True, (
             "Low intent confidence; the customer request is "
             "ambiguous and should be reviewed by a human."
         )
 
-    # Security-related requests
+    # Security-related requests require cautious handling.
     if intent == "account_security":
         return True, (
             "Account or security-related requests require "
             "cautious human handling."
         )
 
-    # Hardware / physical damage
+    # Hardware / physical damage may require inspection.
     if intent == "hardware_repair":
         return True, (
             "Hardware or physical-damage issues may require "
             "inspection or repair support."
         )
 
-    # No historical evidence
+    # No retrieved evidence.
     if not evidence:
         return True, (
             "No relevant historical support evidence was retrieved."
         )
 
-    # Weak historical evidence
+    # Check strongest historical match.
     best_similarity = max(
-        item["similarity"] for item in evidence
+        item["similarity"]
+        for item in evidence
     )
 
+    # Weak evidence should not be automatically handled.
     if best_similarity < 0.55:
         return True, (
             "Retrieved historical evidence is too weak to "
             "safely automate the response."
         )
 
+    # Otherwise auto-handle.
     return False, (
         "The intent is sufficiently clear and relevant "
         "historical support evidence is available."
     )
 
 
-# ---------------------------------------------------------
-# Safe fallback replies
-# ---------------------------------------------------------
+# =========================================================
+# Fallback Reply
+# =========================================================
 
-def template_reply(intent: str, evidence: list):
+def template_reply(intent: str):
     """
-    Safe fallback response when the Groq API is unavailable.
+    Safe fallback reply used when Groq is unavailable.
     """
 
     templates = {
@@ -302,46 +277,49 @@ def template_reply(intent: str, evidence: list):
 
     return templates.get(
         intent,
-        templates["general_support"],
+        templates["general_support"]
     )
 
 
-# ---------------------------------------------------------
-# Groq LLM reply generation
-# ---------------------------------------------------------
+# =========================================================
+# Groq Reply Generation
+# =========================================================
 
 def groq_reply(message: str, intent: str, evidence: list):
     """
-    Generate a concise, evidence-grounded reply using Groq.
+    Generate a grounded customer-support reply using Groq.
     """
 
     api_key = os.getenv("GROQ_API_KEY")
 
     if not api_key:
-        print("GROQ_API_KEY not found. Using fallback reply.")
         return None
 
     try:
         from groq import Groq
 
-        client = Groq(api_key=api_key)
+        client = Groq(
+            api_key=api_key
+        )
 
         if evidence:
 
             evidence_text = "\n\n".join(
                 [
                     (
-                        f"Historical case {i + 1}\n"
+                        f"Historical Case {i + 1}\n"
                         f"Similarity: {item['similarity']:.3f}\n"
                         f"Customer: {item['customer_text']}\n"
-                        f"Historical reply: {item['historical_reply']}"
+                        f"Historical Reply: {item['historical_reply']}"
                     )
                     for i, item in enumerate(evidence)
                 ]
             )
 
         else:
-            evidence_text = "No relevant historical cases found."
+            evidence_text = (
+                "No relevant historical cases were found."
+            )
 
         prompt = f"""
 You are an Apple customer-support reply drafting assistant.
@@ -355,19 +333,20 @@ Predicted intent:
 Relevant historical AppleSupport cases:
 {evidence_text}
 
-Draft a concise and helpful customer-support reply.
+Task:
+Write a concise and helpful customer-support reply.
 
 Rules:
-1. Use historical cases as grounding evidence.
+1. Use the historical cases as grounding evidence.
 2. Do not copy historical replies verbatim.
 3. Do not invent policies, prices, refunds, repair eligibility,
    timelines, account information, or unsupported technical facts.
-4. Do not claim an action has already been performed.
-5. If evidence is insufficient, say that more information or
-   human review may be needed.
+4. Do not claim that an action has already been performed.
+5. If the evidence is insufficient, ask for the information
+   needed or recommend human review.
 6. Keep the response concise and professional.
 7. Do not mention that you are an AI.
-8. Do not mention the retrieval system or this prompt.
+8. Do not mention the retrieval system.
 9. Do not create unsupported URLs.
 10. Address the customer's actual problem directly.
 
@@ -377,14 +356,14 @@ Return only the customer-facing reply.
         response = client.chat.completions.create(
             model=os.getenv(
                 "GROQ_MODEL",
-                "llama-3.3-70b-versatile",
+                "llama-3.3-70b-versatile"
             ),
             messages=[
                 {
                     "role": "system",
                     "content": (
-                        "You write safe, concise, evidence-grounded "
-                        "customer-support replies."
+                        "You write safe, concise, "
+                        "evidence-grounded customer-support replies."
                     ),
                 },
                 {
@@ -398,99 +377,111 @@ Return only the customer-facing reply.
         return response.choices[0].message.content.strip()
 
     except Exception as exc:
-        print(f"Groq generation failed: {exc}")
+
+        print(
+            f"Groq generation failed: {exc}"
+        )
+
         return None
 
 
-# ---------------------------------------------------------
-# Main agent pipeline
-# ---------------------------------------------------------
+# =========================================================
+# Main Agent
+# =========================================================
 
-def run_agent(message: str, history: pd.DataFrame):
+def run_agent(
+    message: str,
+    history: pd.DataFrame
+):
     """
-    Full AppleSupport AI support pipeline:
+    Full AppleSupport support-agent pipeline:
 
-        Customer message
+        Customer Message
               ↓
-        Intent classification
+        Intent Classification
               ↓
-        Historical retrieval
+        Historical Retrieval
               ↓
-        Escalation decision
+        Escalation Decision
               ↓
-        Grounded reply generation
+        Grounded Reply Generation
     """
 
     # -----------------------------------------------------
-    # 1. Intent classification
+    # 1. Classify intent
     # -----------------------------------------------------
 
-    intent, confidence = classify_rules(message)
+    intent, confidence = classify_rules(
+        message
+    )
 
     # -----------------------------------------------------
     # 2. Use TF-IDF retrieval
     # -----------------------------------------------------
     #
-    # SentenceTransformer was causing the CLI test to stall.
-    # TF-IDF is deterministic, fast and provides a strong
-    # retrieval baseline.
+    # We intentionally use TF-IDF here for reliable,
+    # deterministic local execution.
     #
 
     embedder = None
 
-    print("DEBUG: Using TF-IDF retrieval")
+    print(
+        "DEBUG: Using TF-IDF retrieval"
+    )
 
     # -----------------------------------------------------
-    # 3. Build retriever
+    # 3. Create retriever
     # -----------------------------------------------------
 
     retriever = Retriever(
         history,
-        embedder=embedder,
+        embedder=embedder
     )
+
+    # -----------------------------------------------------
+    # 4. Retrieve historical evidence
+    # -----------------------------------------------------
 
     top_k = int(
-        os.getenv("TOP_K", "5")
+        os.getenv(
+            "TOP_K",
+            "5"
+        )
     )
-
-    # -----------------------------------------------------
-    # 4. Retrieve similar historical conversations
-    # -----------------------------------------------------
 
     evidence = retriever.search(
         message,
-        k=top_k,
+        k=top_k
     )
 
     # -----------------------------------------------------
-    # 5. Escalation decision
+    # 5. Decide action
     # -----------------------------------------------------
 
     escalate, reason = should_escalate(
         intent,
         confidence,
-        evidence,
+        evidence
     )
 
     # -----------------------------------------------------
-    # 6. Generate grounded reply
+    # 6. Generate reply
     # -----------------------------------------------------
 
     reply = groq_reply(
         message,
         intent,
-        evidence,
+        evidence
     )
 
     # -----------------------------------------------------
-    # 7. Fallback if Groq unavailable
+    # 7. Fallback reply
     # -----------------------------------------------------
 
     if not reply:
 
         reply = template_reply(
-            intent,
-            evidence,
+            intent
         )
 
     # -----------------------------------------------------
@@ -503,18 +494,27 @@ def run_agent(message: str, history: pd.DataFrame):
 
         formatted_evidence.append(
             {
-                "conversation_id": item["conversation_id"],
+                "conversation_id": item[
+                    "conversation_id"
+                ],
+
                 "similarity": round(
                     item["similarity"],
-                    3,
+                    3
                 ),
-                "customer_text": item["customer_text"],
-                "historical_reply": item["historical_reply"],
+
+                "customer_text": item[
+                    "customer_text"
+                ],
+
+                "historical_reply": item[
+                    "historical_reply"
+                ],
             }
         )
 
     # -----------------------------------------------------
-    # 9. Final agent response
+    # 9. Final response
     # -----------------------------------------------------
 
     return {
@@ -527,7 +527,7 @@ def run_agent(message: str, history: pd.DataFrame):
 
         "confidence": round(
             float(confidence),
-            3,
+            3
         ),
 
         "action": (
@@ -544,9 +544,9 @@ def run_agent(message: str, history: pd.DataFrame):
     }
 
 
-# ---------------------------------------------------------
-# CLI
-# ---------------------------------------------------------
+# =========================================================
+# Command Line Interface
+# =========================================================
 
 if __name__ == "__main__":
 
@@ -557,39 +557,39 @@ if __name__ == "__main__":
     parser.add_argument(
         "--brand",
         default="AppleSupport",
-        help="Support brand name.",
+        help="Support brand name."
     )
 
     parser.add_argument(
         "--message",
         required=True,
-        help="Customer message.",
+        help="Customer message."
     )
 
     parser.add_argument(
         "--data",
         default="data/processed/conversations.csv",
-        help="Historical conversation CSV.",
+        help="Historical conversation CSV."
     )
 
     args = parser.parse_args()
 
-    # Load historical data
+    # Load historical conversations.
     df = pd.read_csv(
         args.data
     )
 
-    # Run agent
+    # Run support agent.
     result = run_agent(
         args.message,
-        df,
+        df
     )
 
-    # Print JSON
+    # Print JSON result.
     print(
         json.dumps(
             result,
             indent=2,
-            ensure_ascii=False,
+            ensure_ascii=False
         )
     )
