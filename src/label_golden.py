@@ -108,6 +108,29 @@ def main():
 
     df = pd.read_csv(path)
 
+    # IMPORTANT:
+    # Convert empty gold columns to string dtype.
+    # Otherwise pandas may treat them as float64
+    # and fail when we insert text such as "app_issue".
+
+    gold_columns = [
+        "gold_intent",
+        "gold_action",
+        "gold_reply_quality",
+        "label_notes",
+    ]
+
+    for column in gold_columns:
+
+        if column not in df.columns:
+            df[column] = ""
+
+        df[column] = (
+            df[column]
+            .fillna("")
+            .astype(str)
+        )
+
     print("\n======================================")
     print(" AppleSupport Golden Set Labeler")
     print("======================================")
@@ -120,8 +143,7 @@ def main():
 
         # Skip already labelled examples
         if (
-            pd.notna(row.get("gold_intent"))
-            and str(row.get("gold_intent")).strip() != ""
+            str(row["gold_intent"]).strip() != ""
         ):
             continue
 
@@ -177,10 +199,25 @@ def main():
 
         note = input("> ").strip()
 
-        df.at[index, "gold_intent"] = gold_intent
-        df.at[index, "gold_action"] = gold_action
-        df.at[index, "gold_reply_quality"] = gold_quality
-        df.at[index, "label_notes"] = note
+        # -------------------------
+        # Save labels
+        # -------------------------
+
+        df.at[index, "gold_intent"] = str(
+            gold_intent
+        )
+
+        df.at[index, "gold_action"] = str(
+            gold_action
+        )
+
+        df.at[index, "gold_reply_quality"] = str(
+            gold_quality
+        )
+
+        df.at[index, "label_notes"] = str(
+            note
+        )
 
         # Save after EVERY example
         df.to_csv(
@@ -198,7 +235,9 @@ def main():
         if command == "q":
 
             print("\nProgress saved.")
-            print("You can run this script again later.")
+            print(
+                "Run the script again to continue."
+            )
 
             break
 
