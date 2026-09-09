@@ -771,10 +771,10 @@ The core retrieval pipeline does **not require a vector database**.
 | 📊 Two baselines | ✅ Done |
 | ⚖️ LLM judge pipeline | ✅ Implemented |
 | 🧪 Automated tests | ✅ 5/5 passed |
-| 🏷️ Golden-set labelling | ⏳ In progress |
-| 📈 Final evaluation | ⏳ Pending |
-| 🔥 Final failure analysis | ⏳ Pending |
-| 📝 Final report metrics | ⏳ Pending |
+| 🏷️ Golden-set labelling | ✅ Done |
+| 📈 Final evaluation | ✅ Done |
+| 🔥 Final failure analysis | ✅ Done |
+| 📝 Final report metrics | ✅ Done |
 
 ---
 
